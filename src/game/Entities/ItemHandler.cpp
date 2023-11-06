@@ -805,6 +805,109 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid) const
     SendPacket(data);
 }
 
+void WorldSession::SendListInventoryForEntry(ObjectGuid vendorguid, uint32 vendorEntry) const
+{
+    DEBUG_LOG("WORLD: Sent SMSG_LIST_INVENTORY");
+    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
+
+    if (!pCreature)
+    {
+        DEBUG_LOG("WORLD: SendListInventory - %s not found or you can't interact with him.", vendorguid.GetString().c_str());
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, ObjectGuid(), 0);
+        return;
+    }
+
+    // Stop the npc if moving
+    if (uint32 pauseTimer = pCreature->GetInteractionPauseTimer())
+        pCreature->GetMotionMaster()->PauseWaypoints(pauseTimer);
+
+    VendorItemData const* vItems = nullptr;
+    VendorItemData const* tItems = nullptr;
+    if (vendorEntry == 0) {
+        vItems = pCreature->GetVendorItems();
+        tItems = pCreature->GetVendorTemplateItems();
+    } else {
+        vItems = sObjectMgr.GetNpcVendorItemList(vendorEntry);
+    }
+
+
+    if (!vItems && !tItems)
+    {
+        WorldPacket data(SMSG_LIST_INVENTORY, (8 + 1 + 1));
+        data << ObjectGuid(vendorguid);
+        data << uint8(0);                                   // count==0, next will be error code
+        data << uint8(0);                                   // "Vendor has no inventory"
+        SendPacket(data);
+        return;
+    }
+
+    uint8 customitems = vItems ? vItems->GetItemCount() : 0;
+    uint8 numitems = customitems + (tItems ? tItems->GetItemCount() : 0);
+
+    uint8 count = 0;
+
+    WorldPacket data(SMSG_LIST_INVENTORY, (8 + 1 + numitems * 8 * 4));
+    data << ObjectGuid(vendorguid);
+
+    size_t count_pos = data.wpos();
+    data << uint8(count);
+
+    float discountMod = _player->GetReputationPriceDiscount(pCreature);
+    for (int i = 0; i < numitems; ++i)
+    {
+        VendorItem const* crItem = i < customitems ? vItems->GetItem(i) : tItems->GetItem(i - customitems);
+
+        if (crItem)
+        {
+            uint32 itemId = crItem->item;
+            ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
+            if (pProto)
+            {
+                if (!_player->IsGameMaster())
+                {
+                    // class wrong item skip only for bindable case
+                    if ((pProto->AllowableClass & _player->getClassMask()) == 0 && pProto->Bonding == BIND_WHEN_PICKED_UP)
+                        continue;
+
+                    // race wrong item skip always
+                    if ((pProto->AllowableRace & _player->getRaceMask()) == 0)
+                        continue;
+
+                    if (crItem->conditionId && !sObjectMgr.IsConditionSatisfied(crItem->conditionId, _player, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
+                        continue;
+                }
+
+                ++count;
+
+                // reputation discount
+                uint32 price = uint32(floor(pProto->BuyPrice * discountMod));
+
+                data << uint32(count);
+                data << uint32(itemId);
+                data << uint32(pProto->DisplayInfoID);
+                data << uint32(crItem->maxcount <= 0 ? 0xFFFFFFFF : pCreature->GetVendorItemCurrentCount(crItem));
+                data << uint32(price);
+                data << uint32(pProto->MaxDurability);
+                data << uint32(pProto->BuyCount);
+                data << uint32(crItem->ExtendedCost);
+
+                // if (count >= MAX_VENDOR_ITEMS)
+                //     break;
+            }
+        }
+    }
+
+    if (count == 0)
+    {
+        data << uint8(0);                                   // "Vendor has no inventory"
+        SendPacket(data);
+        return;
+    }
+
+    data.put<uint8>(count_pos, count);
+    SendPacket(data);
+}
+
 void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recv_data)
 {
     // DEBUG_LOG("WORLD: CMSG_AUTOSTORE_BAG_ITEM");

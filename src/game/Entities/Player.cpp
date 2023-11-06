@@ -2413,35 +2413,28 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
     // some basic checks
     if (!guid || !IsInWorld() || IsTaxiFlying())
         return nullptr;
-
     // set player as interacting
     DoInteraction();
-
+    
     // not in interactive state
     if (hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
         return nullptr;
-
     // exist (we need look pets also for some interaction (quest/etc)
     Creature* unit = GetMap()->GetAnyTypeCreature(guid);
     if (!unit)
         return nullptr;
-
     // appropriate npc type
     if (npcflagmask && !unit->HasFlag(UNIT_NPC_FLAGS, npcflagmask))
         return nullptr;
-
     if (npcflagmask == UNIT_NPC_FLAG_STABLEMASTER)
     {
         if (getClass() != CLASS_HUNTER)
             return nullptr;
     }
-
     if (!CanInteractNow(unit))
         return nullptr;
-
     if (IsAlive() && unit->isInvisibleForAlive())
         return nullptr;
-
     // not too far
     if (!unit->IsWithinDistInMap(this, INTERACTION_DISTANCE))
         return nullptr;
@@ -18852,7 +18845,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         SendBuyError(BUY_ERR_DISTANCE_TOO_FAR, nullptr, item, 0);
         return false;
     }
-
+    // sLog.outString("debug: npc entry: %d", pCreature->GetEntry());
     VendorItemData const* vItems = pCreature->GetVendorItems();
     VendorItemData const* tItems = pCreature->GetVendorTemplateItems();
     if ((!vItems || vItems->Empty()) && (!tItems || tItems->Empty()))
@@ -18861,13 +18854,11 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         return false;
     }
 
-    uint32 vCount = vItems ? vItems->GetItemCount() : 0;
-    uint32 tCount = tItems ? tItems->GetItemCount() : 0;
-
+    uint32 tCount = tItems ? tItems->GetItemCountUint32() : 0;
+    uint32 vCount = vItems ? vItems->GetItemCountUint32() : 0;
     size_t vendorslot = vItems ? vItems->FindItemSlot(item) : vCount;
     if (vendorslot >= vCount)
         vendorslot = vCount + (tItems ? tItems->FindItemSlot(item) : tCount);
-
     if (vendorslot >= vCount + tCount)
     {
         SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
@@ -18943,6 +18934,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
     if (crItem->conditionId && !IsGameMaster() && !sObjectMgr.IsConditionSatisfied(crItem->conditionId, this, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
     {
+        sLog.outString("debug:4");
         SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
         return false;
     }

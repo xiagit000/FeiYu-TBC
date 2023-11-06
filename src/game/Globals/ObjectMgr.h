@@ -1097,7 +1097,7 @@ class ObjectMgr
             CacheVendorItemMap::const_iterator  iter = m_mCacheVendorItemMap.find(entry);
             if (iter == m_mCacheVendorItemMap.end())
                 return nullptr;
-
+            
             return &iter->second;
         }
 

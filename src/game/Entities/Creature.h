@@ -413,6 +413,7 @@ struct VendorItemData
     }
     bool Empty() const { return m_items.empty(); }
     uint8 GetItemCount() const { return m_items.size(); }
+    uint32 GetItemCountUint32() const { return m_items.size(); }
     void AddItem(uint32 item, uint32 maxcount, uint32 ptime, uint32 ExtendedCost, uint16 conditonId)
     {
         m_items.push_back(new VendorItem(item, maxcount, ptime, ExtendedCost, conditonId));

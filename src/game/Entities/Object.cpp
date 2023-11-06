@@ -525,15 +525,15 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                     uint32 value = m_uint32Values[index];
 
                     // Fog of War: replace absolute health values with percentages for non-allied units according to settings
-                    if (!static_cast<const Unit*>(this)->IsFogOfWarVisibleHealth(target) &&
-                        !target->CanSeeSpecialInfoOf(static_cast<const Unit*>(this)))
-                    {
-                        switch (index)
-                        {
-                            case UNIT_FIELD_HEALTH:     value = uint32(ceil((100.0 * value) / m_uint32Values[UNIT_FIELD_MAXHEALTH]));   break;
-                            case UNIT_FIELD_MAXHEALTH:  value = 100;                                                                    break;
-                        }
-                    }
+                    // if (!static_cast<const Unit*>(this)->IsFogOfWarVisibleHealth(target) &&
+                    //     !target->CanSeeSpecialInfoOf(static_cast<const Unit*>(this)))
+                    // {
+                    //     switch (index)
+                    //     {
+                    //         case UNIT_FIELD_HEALTH:     value = uint32(ceil((100.0 * value) / m_uint32Values[UNIT_FIELD_MAXHEALTH]));   break;
+                    //         case UNIT_FIELD_MAXHEALTH:  value = 100;                                                                    break;
+                    //     }
+                    // }
 
                     *data << value;
                 }
