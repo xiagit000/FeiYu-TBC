@@ -1441,6 +1441,7 @@ void Unit::JustKilledCreature(Unit* killer, Creature* victim, Player* responsibl
     if (responsiblePlayer)                                  // killedby Player, inform BG
 #ifdef BUILD_ELUNA
     {
+<<<<<<< HEAD
         if (BattleGround* bg = responsiblePlayer->GetBattleGround())
             bg->HandleKillUnit(victim, responsiblePlayer);
         // used by eluna
@@ -1449,6 +1450,16 @@ void Unit::JustKilledCreature(Unit* killer, Creature* victim, Player* responsibl
 #else
         if (BattleGround* bg = responsiblePlayer->GetBattleGround())
             bg->HandleKillUnit(victim, responsiblePlayer);
+=======
+        if (BattleGround* bg = responsiblePlayer->GetBattleGround())
+            bg->HandleKillUnit(victim, responsiblePlayer);
+        // used by eluna
+        sEluna->OnCreatureKill(responsiblePlayer, victim);
+    }
+#else
+        if (BattleGround* bg = responsiblePlayer->GetBattleGround())
+            bg->HandleKillUnit(victim, responsiblePlayer);
+>>>>>>> upstream/master
 #endif
 
     // Notify the outdoor pvp script
