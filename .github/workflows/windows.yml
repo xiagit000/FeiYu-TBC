@@ -9,11 +9,7 @@ env:
   REPO_DIR : ${{github.workspace}}
   BUILD_DIR: ${{github.workspace}}/bin/builddir
   BOOST_TOOLSET: "msvc"
-<<<<<<< HEAD
-  BOOST_VERSION: "1.79.0"
-=======
   BOOST_VERSION: "1.83.0"
->>>>>>> upstream/master
   BOOST_PLATFORM_VERSION: "2022"
 
 jobs:
@@ -36,13 +32,8 @@ jobs:
           cmake -E make_directory ${{ env.BUILD_DIR }}
 
       # install dependencies
-<<<<<<< HEAD
-      - name: Install boost
-        uses: MarkusJx/install-boost@v2.4.1
-=======
       - name: Install Boost
         uses: MarkusJx/install-boost@v2.4.4
->>>>>>> upstream/master
         id: install-boost
         with:
           # REQUIRED: Specify the required boost version
@@ -71,11 +62,7 @@ jobs:
           cd ${{env.BUILD_DIR}}/bin
           7z a -tzip ${{env.ARCHIVE_FILENAME}} x64_Release
 
-<<<<<<< HEAD
-      - name: Archive this artefact
-=======
       - name: Archive The Artifact
->>>>>>> upstream/master
         uses: actions/upload-artifact@v3
         with:
           name: snapshot

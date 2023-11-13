@@ -12,11 +12,7 @@ env:
   REPO_DIR : ${{github.workspace}}
   BUILD_DIR: ${{github.workspace}}/bin/builddir
   BOOST_TOOLSET: "msvc"
-<<<<<<< HEAD
-  BOOST_VERSION: "1.79.0"
-=======
   BOOST_VERSION: "1.83.0"
->>>>>>> upstream/master
   BOOST_PLATFORM_VERSION: "2022"
 
 jobs:
@@ -57,13 +53,8 @@ jobs:
           cmake -E make_directory ${{ env.BUILD_DIR }}
 
       # install dependencies
-<<<<<<< HEAD
-      - name: Install boost
-        uses: MarkusJx/install-boost@v2.4.1
-=======
       - name: Install Boost
         uses: MarkusJx/install-boost@v2.4.4
->>>>>>> upstream/master
         id: install-boost
         with:
           # REQUIRED: Specify the required boost version
@@ -91,12 +82,8 @@ jobs:
         run: |
           cd ${{env.BUILD_DIR}}/bin
           7z a -tzip ${{env.ARCHIVE_FILENAME}} "x64_${{env.BUILD_TYPE}}"
-<<<<<<< HEAD
-      - name: Archive this artefact
-=======
 
       - name: Archive The Artefact
->>>>>>> upstream/master
         uses: actions/upload-artifact@v3
         with:
           name: snapshot-${{matrix.TYPE}}
@@ -109,47 +96,27 @@ jobs:
     needs: build
 
     steps:
-<<<<<<< HEAD
-      - name: Download artifact snapshot-default
-=======
       - name: Download Artifact snapshot-default
->>>>>>> upstream/master
         uses: actions/download-artifact@v3
         with:
           name: snapshot-default
           path: all_snapshots
-<<<<<<< HEAD
-      - name: Download artifact snapshot-with-all
-=======
       - name: Download Artifact snapshot-with-all
->>>>>>> upstream/master
         uses: actions/download-artifact@v3
         with:
           name: snapshot-with-all
           path: all_snapshots
-<<<<<<< HEAD
-      - name: Download artifact snapshot-with-eluna-playerbot-ahbot
-=======
       - name: Download Artifact snapshot-with-eluna-playerbot-ahbot
->>>>>>> upstream/master
         uses: actions/download-artifact@v3
         with:
           name: snapshot-with-eluna-playerbot-ahbot
           path: all_snapshots
-<<<<<<< HEAD
-      - name: Download artifact snapshot-with-eluna-playerbot
-=======
       - name: Download Artifact snapshot-with-eluna-playerbot
->>>>>>> upstream/master
         uses: actions/download-artifact@v3
         with:
           name: snapshot-with-eluna-playerbot
           path: all_snapshots
-<<<<<<< HEAD
-      - name: Download artifact snapshot-with-eluna-ahbot
-=======
       - name: Download Artifact snapshot-with-eluna-ahbot
->>>>>>> upstream/master
         uses: actions/download-artifact@v3
         with:
           name: snapshot-with-eluna-ahbot
